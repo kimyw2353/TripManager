@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.mapper.InforMapper">
+	
+	<select id="selectLocationByNum" resultType="location.model.LocationVO" parameterType="_int">
+		select * from location where loc_num = #{num}
+	</select>
+	
+	<select id="selectInformationByNum" resultType="information.model.InformationVO" parameterType="_int">
+		select * from information where loc_num = #{num}
+	</select>
+	
+	<select id="selectRecommendByNum" resultType="recommend.model.RecommendVO" parameterType="_int">
+		select * from recommend where info_num = #{num}
+	</select>
+	
+</mapper>

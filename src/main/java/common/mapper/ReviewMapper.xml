@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.mapper.ReviewMapper">
+	<!-- 전체리뷰 목록 -->
+	<select id="review" parameterType="_int" resultType="Review">
+		select * from 
+		(
+			select rownum rn, r.*, (select count(loc_num) from location where loc_num =r.loc_num) 
+			re_cnt from review r order by re_date desc
+		)
+		where loc_num=#{loc_num} and rn between #{start} and #{end}
+	</select>
+
+	<!-- 지역마다 총 리뷰 수 -->
+	<select id="getTotalCount" resultType="_int">
+		select count(*) from
+		review where loc_num=#{loc_num}
+	</select>
+
+	<!-- 선택한 리뷰 가져오기 -->
+	<select id="reviewChk" resultType="Review">
+		select * from review where
+		re_num=#{re_num}
+	</select>
+
+	<update id="updateReadnum" parameterType="Review">
+		update review set
+		re_readnum = re_readnum+1 where re_num =#{value}
+	</update>
+
+	<!-- 리뷰 등록 -->
+	<insert id="insertReview" parameterType="Review">
+		<selectKey keyProperty="re_num" resultType="_int"
+			order="BEFORE">
+			select review_seq.nextval from dual
+		</selectKey>
+		insert into review values(#{loc_num},#{re_num},(select loc_name from
+		location where loc_num = #{loc_num}),#{re_name}, #{u_id},sysdate,
+		(select u_pwd from users where u_id = #{u_id}),#{re_content},0)
+	</insert>
+
+	<!-- 사용자가 작성한 리뷰보기 -->
+	<select id="reviewList" resultType="Review">
+		select * from review where
+		u_id=#{u_id} and loc_num=#{loc_num} order by re_date desc
+	</select>
+
+ 	<!-- 리뷰에 대한 댓글수 가져오기 -->
+	<select id="getCommentCountByIdx" parameterType="Review" resultType="_int">
+		select count(re_num) from cmt where re_num=#{re_num}
+	</select>
+
+ 	<!-- 리뷰 삭제 전에 댓글 먼저 삭제 -->
+ 	<delete id="deleteCommentAll" parameterType="Review">
+ 		delete from cmt where re_num=#{re_num}
+ 	</delete>
+
+	<!-- 리뷰 삭제 -->
+	<delete id="deleteReview" parameterType="Review">
+		delete from review where
+		re_num=#{re_num}
+	</delete>
+
+	<!-- 파라미터로 넘겨받은 값에 대한 리뷰 불러오기 -->
+	<select id="updateList" resultType="Review">
+		select * from review where
+		re_num=#{re_num}
+	</select>
+
+	<!-- 리뷰 수정 -->
+	<update id="updateReview" parameterType="Review">
+		update review set
+		re_name=#{re_name}, re_content=#{re_content} where
+		re_num=#{re_num} and
+		u_id=#{u_id}
+	</update>
+
+</mapper>
